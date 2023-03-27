@@ -18,6 +18,12 @@ def getTournamentGameByGame():
     df2 = df.loc[df["Year"] >= 2013]
 
     df2 = df2.iloc[::2]
+    
+    id = list(range(0,441))
+    df2['id'] = id
+    
+    df2['Team1'] = df2['Team1'].str.lower()
+    df2['Team2'] = df2['Team2'].str.lower()
 
     
 
