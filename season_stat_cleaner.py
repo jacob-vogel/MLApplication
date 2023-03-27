@@ -219,7 +219,7 @@ def fix_team_name(team): # for an apply method
         team = team.replace('st.', 'state')
     return team
 
-def make_season_stats_data():
+def make_season_stats_data(make_csv = False):
     seasons_stats_csv = os.getcwd() + "\\March Madness Data\\Season_Stat_Data_13_21\\cbb.csv"
     df = pd.read_csv(seasons_stats_csv)
     df = df.drop(['SEED','POSTSEASON'], axis = 1)
@@ -229,8 +229,11 @@ def make_season_stats_data():
     #num_years = 2019-2013
     df['TEAM'] = df['TEAM'].apply(fix_team_name)
     df =  df[df['TEAM'].apply(lambda x: x in tournament_teams_13_19)]
+    assert sorted(list(df['TEAM'].unique())) == sorted(tournament_teams_13_19)
+    if(make_csv):
+         make_season_stat_csv(df)
     return df
-
+    
 
 def make_season_stat_csv(df):
-     df.to_csv("ncaam_season_stats_13-19.csv")
+     df.to_csv("C:\\Users\\user\\CU_2023_Spring\Macine Learning\\ML Application Project\\MLApplication\March Madness Data\\Season_Stat_Data_13_21\\ncaam_season_stats_13-19.csv")
