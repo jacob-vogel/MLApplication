@@ -1,3 +1,4 @@
+#data: https://www.kaggle.com/datasets/andrewsundberg/college-basketball-dataset?select=cbb.csv
 import pandas as pd
 import numpy as np 
 import scipy as sci
@@ -187,6 +188,7 @@ tournament_teams_13_19 = {
  'Xavier',
  'Yale'
  }
+tournament_teams_13_19 = {ele.lower() for ele in tournament_teams_13_19}
 
 def fix_team_name(team): # for an apply method
     team = team.lower()
@@ -211,13 +213,16 @@ def fix_team_name(team): # for an apply method
         'pittsburgh': 'pitt',
         'albany': 'albany (ny)'
     }
-    change = False
+    change = True
     if team in orig_to_jacob.keys():
             team = orig_to_jacob[team]
-            change = True
-    if 'st.' in team and not change:
+            change = False
+    if 'st.' in team and change:
         team = team.replace('st.', 'state')
     return team
+
+#def make_win_rate():
+    
 
 def make_season_stats_data(make_csv = False):
     seasons_stats_csv = os.getcwd() + "\\March Madness Data\\Season_Stat_Data_13_21\\cbb.csv"
@@ -226,10 +231,22 @@ def make_season_stats_data(make_csv = False):
     years = list(df.YEAR.unique())
     assert min(years) == 2013
     assert max(years) == 2019
-    #num_years = 2019-2013
+    
     df['TEAM'] = df['TEAM'].apply(fix_team_name)
     df =  df[df['TEAM'].apply(lambda x: x in tournament_teams_13_19)]
     assert sorted(list(df['TEAM'].unique())) == sorted(tournament_teams_13_19)
+    
+    df['WIN_RATE'] = df['W']/df['G']
+    df = df.drop(['G','W'], axis = 1)
+    assert 'G' not in list(df.columns)
+    assert 'W' not in list(df.columns)
+    assert df['WIN_RATE'].isna().sum() == 0
+    
+    df = df.rename(columns={'YEAR': 'Year', "TEAM" : "Team"})
+    assert df['Year'].isna().sum() == 0
+    assert df['Team'].isna().sum() == 0
+    assert df[df['Team'] == ""].shape[0] == 0
+    
     if(make_csv):
          make_season_stat_csv(df)
     return df
